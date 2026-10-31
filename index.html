@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko" data-theme="paper">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>비북스 · 원미동 작은 서가</title>
+  <meta name="description" content="부천 원미동 동네 서점 비북스의 온라인 서가. 말없이 머물며 한국 근대 문학을 천천히 읽는 곳.">
+  <meta name="theme-color" content="#efe6d6">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='10' y='8' width='44' height='48' rx='4' fill='%2324251f'/%3E%3Crect x='16' y='8' width='4' height='48' fill='%23966640'/%3E%3Ctext x='37' y='41' font-size='22' text-anchor='middle' fill='%23efe6d6' font-family='serif'%3EB%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <!-- 입장 화면 -->
+  <div id="intro" class="intro" role="status" aria-live="polite">
+    <div class="intro-door" aria-hidden="true">
+      <span class="door left"></span>
+      <span class="door right"></span>
+    </div>
+    <p class="intro-text">서점 문을 여는 중<span class="dots" aria-hidden="true"><i>.</i><i>.</i><i>.</i></span></p>
+    <p class="intro-sub">비북스 · 부천 원미동</p>
+    <p id="intro-error" class="intro-error" hidden></p>
+  </div>
+
+  <!-- 서가 화면 -->
+  <main id="shelf-view" class="shelf-view" hidden>
+    <div class="shelf-top">
+      <p class="shop-mark">비북스<span>Bbooks</span></p>
+      <div class="shelf-tools" role="group" aria-label="서점 분위기 설정">
+        <button type="button" class="pill" data-action="theme" aria-pressed="false" title="밤 배경으로 바꾸기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>밤
+        </button>
+        <button type="button" class="pill" data-action="sound" aria-pressed="false" title="잔잔한 빗소리 켜기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M7 15l-1.5 3M12 15l-1.5 3M17 15l-1.5 3M6.5 12a4.5 4.5 0 0 1 .4-9 6 6 0 0 1 11.2 2.5A3.5 3.5 0 0 1 17.5 12Z"/></svg>빗소리
+        </button>
+      </div>
+    </div>
+
+    <header class="shelf-intro">
+      <h1>원미동 작은 서가</h1>
+      <p class="lead">말없이 머물다 가는 서점입니다. 마음 가는 책 한 권을 골라 천천히 읽어 보세요.</p>
+    </header>
+
+    <section class="bookcase" aria-label="서가">
+      <ul id="shelf" class="shelf"></ul>
+    </section>
+
+    <footer class="shelf-footer">
+      <p id="today-total" class="today-total"></p>
+      <p>이 서가의 책은 모두 저작권 보호기간이 끝난 한국 근대 문학입니다. 읽은 쪽수와 시간은 이 기기의 브라우저에만 저장되며, 어디로도 보내지 않습니다.</p>
+    </footer>
+  </main>
+
+  <!-- 읽기 모드 -->
+  <section id="reader" class="reader" hidden aria-label="읽기 화면">
+    <header class="reader-bar top">
+      <button type="button" id="btn-back" class="pill" aria-label="서가로 돌아가기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6"/></svg>돌아가기
+      </button>
+      <h2 id="reader-title" class="reader-title"></h2>
+      <p id="reader-progress" class="progress" aria-live="polite"></p>
+    </header>
+    <div class="progress-line" aria-hidden="true"><span id="progress-fill"></span></div>
+
+    <div id="stage" class="stage">
+      <div id="book" class="book" tabindex="0" role="region" aria-roledescription="책"
+           aria-label="책 본문. 왼쪽·오른쪽 화살표 키로 페이지를 넘깁니다."></div>
+      <button type="button" class="edge prev" id="btn-prev" aria-label="이전 페이지">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6"/></svg>
+      </button>
+      <button type="button" class="edge next" id="btn-next" aria-label="다음 페이지">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <div id="resume-toast" class="toast" role="status" hidden>
+        <span id="resume-text"></span>
+        <button type="button" id="btn-restart">처음부터</button>
+      </div>
+    </div>
+
+    <footer class="reader-bar bottom">
+      <p class="timer">
+        <span class="label"><span class="long">오늘 읽은 시간</span><span class="short">오늘</span></span>
+        <time id="timer" datetime="PT0S">00:00</time>
+        <span id="timer-note" class="timer-note"></span>
+      </p>
+      <div class="tools" role="group" aria-label="읽기 설정">
+        <button type="button" id="font-down" class="pill" aria-label="글자 작게">가<small>−</small></button>
+        <button type="button" id="font-up" class="pill" aria-label="글자 크게">가<small>+</small></button>
+        <button type="button" class="pill" data-action="theme" aria-pressed="false" title="밤 배경으로 바꾸기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>밤
+        </button>
+        <button type="button" class="pill" data-action="sound" aria-pressed="false" title="잔잔한 빗소리 켜기">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M7 15l-1.5 3M12 15l-1.5 3M17 15l-1.5 3M6.5 12a4.5 4.5 0 0 1 .4-9 6 6 0 0 1 11.2 2.5A3.5 3.5 0 0 1 17.5 12Z"/></svg>빗소리
+        </button>
+      </div>
+    </footer>
+  </section>
+
+  <noscript>
+    <p class="noscript">이 서가는 자바스크립트가 켜져 있어야 열립니다.</p>
+  </noscript>
+</body>
+</html>
